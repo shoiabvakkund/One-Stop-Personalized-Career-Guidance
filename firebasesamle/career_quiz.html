@@ -1,0 +1,415 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Student Career Interest Quiz</title>
+  <style>
+    body { 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+      background: linear-gradient(135deg, #667eea, #764ba2, #f093fb); 
+      color: #fff; 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      min-height: 100vh; 
+      margin: 0; 
+      padding: 20px;
+    }
+    .container { 
+      background: rgba(255, 255, 255, 0.15); 
+      backdrop-filter: blur(10px);
+      padding: 40px; 
+      border-radius: 15px; 
+      width: 90%; 
+      max-width: 700px; 
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5); 
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    h1 { 
+      text-align: center; 
+      margin-bottom: 10px; 
+      font-size: 2em;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+    .subtitle {
+      text-align: center;
+      font-size: 0.95em;
+      opacity: 0.9;
+      margin-bottom: 20px;
+    }
+    .progress-container {
+      background: rgba(255,255,255,0.2);
+      border-radius: 10px;
+      height: 8px;
+      margin: 20px 0;
+      overflow: hidden;
+    }
+    .progress-bar {
+      background: linear-gradient(90deg, #4facfe, #00f2fe);
+      height: 100%;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+    .question-counter {
+      text-align: center;
+      font-size: 0.9em;
+      opacity: 0.8;
+      margin-bottom: 20px;
+    }
+    .question { 
+      font-size: 1.3em;
+      margin-bottom: 25px; 
+      font-weight: 500;
+    }
+    .options { 
+      display: flex; 
+      flex-direction: column; 
+      gap: 12px; 
+    }
+    .options label {
+      background: rgba(255,255,255,0.15);
+      padding: 15px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+      display: flex;
+      align-items: center;
+    }
+    .options label:hover {
+      background: rgba(255,255,255,0.25);
+      border-color: #4facfe;
+      transform: translateX(5px);
+    }
+    .options input[type="radio"] {
+      margin-right: 12px;
+      cursor: pointer;
+      width: 18px;
+      height: 18px;
+    }
+    button { 
+      background: linear-gradient(135deg, #4facfe, #00f2fe);
+      color: white; 
+      border: none; 
+      padding: 12px 30px; 
+      border-radius: 8px; 
+      cursor: pointer; 
+      margin-top: 20px; 
+      font-size: 1em;
+      font-weight: 600;
+      width: 100%;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(79,172,254,0.4);
+    }
+    button:hover { 
+      background: linear-gradient(135deg, #00f2fe, #4facfe);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(79,172,254,0.5);
+    }
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    #result { 
+      text-align: center; 
+      margin-top: 20px; 
+    }
+    .result-title {
+      font-size: 1.8em;
+      margin-bottom: 15px;
+      color: #4facfe;
+      text-shadow: 0 0 10px rgba(79,172,254,0.5);
+    }
+    .result-description {
+      font-size: 1.1em;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+    .career-suggestions {
+      background: rgba(255,255,255,0.15);
+      padding: 20px;
+      border-radius: 10px;
+      margin-top: 20px;
+      text-align: left;
+    }
+    .career-suggestions h3 {
+      color: #4facfe;
+      margin-bottom: 15px;
+      font-size: 1.3em;
+    }
+    .career-suggestions .section {
+      margin-bottom: 20px;
+    }
+    .career-suggestions .section-title {
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 8px;
+      font-size: 1.05em;
+    }
+    .career-suggestions ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .career-suggestions li {
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .career-suggestions li:last-child {
+      border-bottom: none;
+    }
+    .restart-btn {
+      background: linear-gradient(135deg, #f093fb, #f5576c);
+      margin-top: 15px;
+    }
+    .restart-btn:hover {
+      background: linear-gradient(135deg, #f5576c, #f093fb);
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📚 Student Career Quiz</h1>
+    <p class="subtitle">Discover your ideal study stream and career path!</p>
+    <div id="quizSection">
+      <div class="question-counter" id="counter"></div>
+      <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+      <div id="quiz"></div>
+      <button id="nextBtn">Next Question</button>
+    </div>
+    <div id="result" class="hidden"></div>
+  </div>
+  <script>
+    const questions = [
+      {
+        question: 'Which subject do you find most interesting in school?',
+        options: [
+          { text: 'Mathematics and Physics', type: 'STEM', points: 3 },
+          { text: 'Biology and Chemistry', type: 'Medical', points: 3 },
+          { text: 'Economics and Business Studies', type: 'Commerce', points: 3 },
+          { text: 'History and Literature', type: 'Humanities', points: 3 }
+        ]
+      },
+      {
+        question: 'What kind of school projects do you enjoy most?',
+        options: [
+          { text: 'Building models or coding programs', type: 'STEM', points: 3 },
+          { text: 'Conducting science experiments', type: 'Medical', points: 3 },
+          { text: 'Planning events or budgets', type: 'Commerce', points: 3 },
+          { text: 'Writing essays or research papers', type: 'Humanities', points: 3 }
+        ]
+      },
+      {
+        question: 'How do you prefer to study?',
+        options: [
+          { text: 'Solving problems and equations', type: 'STEM', points: 2 },
+          { text: 'Practical experiments and labs', type: 'Medical', points: 2 },
+          { text: 'Case studies and real examples', type: 'Commerce', points: 2 },
+          { text: 'Reading and taking notes', type: 'Humanities', points: 2 }
+        ]
+      },
+      {
+        question: 'What are you naturally good at?',
+        options: [
+          { text: 'Logical thinking and problem-solving', type: 'STEM', points: 3 },
+          { text: 'Understanding how things work in nature', type: 'Medical', points: 3 },
+          { text: 'Managing money and planning', type: 'Commerce', points: 3 },
+          { text: 'Writing and communication', type: 'Humanities', points: 3 }
+        ]
+      },
+      {
+        question: 'Which extracurricular activity appeals to you?',
+        options: [
+          { text: 'Robotics or Coding Club', type: 'STEM', points: 3 },
+          { text: 'Science or Environmental Club', type: 'Medical', points: 3 },
+          { text: 'Business or Entrepreneurship Club', type: 'Commerce', points: 3 },
+          { text: 'Debate or Literary Society', type: 'Humanities', points: 3 }
+        ]
+      },
+      {
+        question: 'What motivates you to study hard?',
+        options: [
+          { text: 'Solving complex challenges', type: 'STEM', points: 2 },
+          { text: 'Helping people stay healthy', type: 'Medical', points: 2 },
+          { text: 'Building a successful career', type: 'Commerce', points: 2 },
+          { text: 'Learning about ideas and history', type: 'Humanities', points: 2 }
+        ]
+      },
+      {
+        question: 'Which book or movie topic interests you most?',
+        options: [
+          { text: 'Science fiction or technology', type: 'STEM', points: 2 },
+          { text: 'Medical dramas or nature documentaries', type: 'Medical', points: 2 },
+          { text: 'Business success stories', type: 'Commerce', points: 2 },
+          { text: 'Historical dramas or biographies', type: 'Humanities', points: 2 }
+        ]
+      },
+      {
+        question: 'What would be your dream classroom setup?',
+        options: [
+          { text: 'Computer lab with latest software', type: 'STEM', points: 2 },
+          { text: 'Laboratory with equipment', type: 'Medical', points: 2 },
+          { text: 'Mock office or trading floor', type: 'Commerce', points: 2 },
+          { text: 'Library with lots of books', type: 'Humanities', points: 2 }
+        ]
+      },
+      {
+        question: 'How do you approach a difficult assignment?',
+        options: [
+          { text: 'Break it into logical steps', type: 'STEM', points: 2 },
+          { text: 'Apply scientific methods', type: 'Medical', points: 2 },
+          { text: 'Plan and organize systematically', type: 'Commerce', points: 2 },
+          { text: 'Research thoroughly first', type: 'Humanities', points: 2 }
+        ]
+      },
+      {
+        question: 'What kind of career sounds most exciting to you?',
+        options: [
+          { text: 'Working with technology and innovation', type: 'STEM', points: 3 },
+          { text: 'Healthcare and research', type: 'Medical', points: 3 },
+          { text: 'Business and entrepreneurship', type: 'Commerce', points: 3 },
+          { text: 'Law, journalism, or education', type: 'Humanities', points: 3 }
+        ]
+      }
+    ];
+
+    let currentQuestion = 0;
+    const scores = { 
+      STEM: 0, 
+      Medical: 0, 
+      Commerce: 0, 
+      Humanities: 0 
+    };
+    
+    const quizDiv = document.getElementById('quiz');
+    const nextBtn = document.getElementById('nextBtn');
+    const resultDiv = document.getElementById('result');
+    const quizSection = document.getElementById('quizSection');
+    const progressBar = document.getElementById('progressBar');
+    const counter = document.getElementById('counter');
+
+    function updateProgress() {
+      const progress = (currentQuestion / questions.length) * 100;
+      progressBar.style.width = progress + '%';
+      counter.textContent = `Question ${currentQuestion + 1} of ${questions.length}`;
+    }
+
+    function showQuestion() {
+      const q = questions[currentQuestion];
+      const optionsHTML = q.options.map((option, index) => `
+        <label>
+          <input type="radio" name="answer" value="${index}">
+          ${option.text}
+        </label>
+      `).join('');
+      
+      quizDiv.innerHTML = `
+        <div class="question">${q.question}</div>
+        <div class="options">
+          ${optionsHTML}
+        </div>
+      `;
+      
+      updateProgress();
+      nextBtn.textContent = currentQuestion === questions.length - 1 ? 'See Results' : 'Next Question';
+      nextBtn.disabled = true;
+      
+      document.querySelectorAll('input[name="answer"]').forEach(input => {
+        input.addEventListener('change', () => {
+          nextBtn.disabled = false;
+        });
+      });
+    }
+
+    function showResult() {
+      const topInterest = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
+      
+      const careerInfo = {
+        STEM: {
+          title: 'Science, Technology, Engineering & Math',
+          description: 'You have a strong aptitude for logical thinking, problem-solving, and working with numbers and technology. You enjoy understanding how things work and creating innovative solutions.',
+          streams: ['Science (PCM - Physics, Chemistry, Math)', 'Computer Science', 'Information Technology', 'Applied Sciences'],
+          careers: ['Software Engineer', 'Data Scientist', 'Mechanical Engineer', 'Aerospace Engineer', 'Robotics Engineer', 'Computer Programmer', 'Civil Engineer', 'Electrical Engineer'],
+          colleges: ['IITs', 'NITs', 'BITS Pilani', 'DTU', 'Top Engineering Colleges']
+        },
+        Medical: {
+          title: 'Medical & Life Sciences',
+          description: 'You have a strong interest in biology, health sciences, and understanding how living organisms work. You\'re passionate about helping others stay healthy.',
+          streams: ['Science (PCB - Physics, Chemistry, Biology)', 'Health Sciences', 'Biotechnology', 'Pharmacy'],
+          careers: ['Doctor (MBBS)', 'Dentist', 'Pharmacist', 'Physiotherapist', 'Biomedical Scientist', 'Nurse', 'Veterinarian', 'Medical Researcher'],
+          colleges: ['AIIMS', 'CMC Vellore', 'JIPMER', 'MAMC', 'Top Medical Colleges']
+        },
+        Commerce: {
+          title: 'Commerce & Business',
+          description: 'You have strong analytical and organizational skills with an interest in business, finance, and economics. You understand money management and market dynamics.',
+          streams: ['Commerce (Accountancy, Business Studies, Economics)', 'BBA', 'B.Com'],
+          careers: ['Chartered Accountant (CA)', 'Investment Banker', 'Business Analyst', 'Financial Advisor', 'Entrepreneur', 'Marketing Manager', 'Economist', 'Company Secretary'],
+          colleges: ['SRCC', 'LSR', 'Hansraj College', 'NMIMS', 'Symbiosis']
+        },
+        Humanities: {
+          title: 'Humanities & Liberal Arts',
+          description: 'You excel at critical thinking, writing, and understanding complex ideas. You enjoy exploring history, literature, philosophy, and human culture.',
+          streams: ['Humanities (History, Political Science, English)', 'Liberal Arts', 'Mass Communication', 'Journalism'],
+          careers: ['Journalist', 'Lawyer', 'Content Writer', 'Teacher/Professor', 'Civil Services Officer', 'Author', 'Editor', 'Historian'],
+          colleges: ['St. Stephen\'s College', 'Miranda House', 'Ashoka University', 'Symbiosis', 'Christ University']
+        }
+      };
+
+      const info = careerInfo[topInterest];
+      
+      quizSection.classList.add('hidden');
+      resultDiv.classList.remove('hidden');
+      resultDiv.innerHTML = `
+        <div class="result-title">${info.title}</div>
+        <div class="result-description">${info.description}</div>
+        <div class="career-suggestions">
+          <div class="section">
+            <div class="section-title">📖 Recommended Study Streams:</div>
+            <ul>
+              ${info.streams.map(stream => `<li>• ${stream}</li>`).join('')}
+            </ul>
+          </div>
+          <div class="section">
+            <div class="section-title">💼 Career Options:</div>
+            <ul>
+              ${info.careers.map(career => `<li>• ${career}</li>`).join('')}
+            </ul>
+          </div>
+          <div class="section">
+            <div class="section-title">🎓 Top Colleges/Institutes:</div>
+            <ul>
+              ${info.colleges.map(college => `<li>• ${college}</li>`).join('')}
+            </ul>
+          </div>
+        </div>
+        <button class="restart-btn" onclick="location.reload()">Take Quiz Again</button>
+      `;
+    }
+
+    nextBtn.addEventListener('click', () => {
+      const selected = document.querySelector('input[name="answer"]:checked');
+      if (!selected) return;
+      
+      const q = questions[currentQuestion];
+      const selectedOption = q.options[parseInt(selected.value)];
+      scores[selectedOption.type] += selectedOption.points;
+      
+      currentQuestion++;
+      if (currentQuestion < questions.length) {
+        showQuestion();
+      } else {
+        showResult();
+      }
+    });
+
+    showQuestion();
+  </script>
+</body>
+</html>

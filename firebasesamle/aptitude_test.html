@@ -1,0 +1,437 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Company Aptitude Test</title>
+  <style>
+    body { 
+      font-family: 'Segoe UI', Arial, sans-serif; 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #222; 
+      margin: 0; 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container { 
+      background: #fff; 
+      border-radius: 15px; 
+      padding: 40px; 
+      width: 90%; 
+      max-width: 750px; 
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+    h1 { 
+      text-align: center; 
+      color: #667eea; 
+      margin-bottom: 10px;
+      font-size: 2em;
+    }
+    p.intro { 
+      text-align: center; 
+      color: #666; 
+      font-size: 15px; 
+      margin-bottom: 25px;
+      line-height: 1.5;
+    }
+    .progress-container {
+      background: #e0e0e0;
+      border-radius: 10px;
+      height: 8px;
+      margin: 20px 0;
+      overflow: hidden;
+    }
+    .progress-bar {
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      height: 100%;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+    .question-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      font-size: 0.9em;
+      color: #666;
+    }
+    .question-category {
+      background: #f0f4ff;
+      padding: 5px 12px;
+      border-radius: 15px;
+      color: #667eea;
+      font-weight: 600;
+      font-size: 0.85em;
+    }
+    .question { 
+      margin-bottom: 20px; 
+      font-weight: 600;
+      font-size: 1.15em;
+      color: #333;
+      line-height: 1.5;
+    }
+    .options { 
+      display: flex; 
+      flex-direction: column; 
+      gap: 10px; 
+    }
+    label { 
+      background: #f8f9fa; 
+      border-radius: 8px; 
+      padding: 14px 16px; 
+      cursor: pointer; 
+      border: 2px solid transparent;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+    }
+    label:hover { 
+      border-color: #667eea;
+      background: #f0f4ff;
+      transform: translateX(5px);
+    }
+    label input[type="radio"] {
+      margin-right: 12px;
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+    button { 
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white; 
+      border: none; 
+      padding: 12px 25px; 
+      border-radius: 8px; 
+      cursor: pointer; 
+      margin-top: 20px;
+      font-size: 1em;
+      font-weight: 600;
+      width: 100%;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(102,126,234,0.4);
+    }
+    button:hover { 
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102,126,234,0.5);
+    }
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    #result { 
+      text-align: center; 
+      margin-top: 30px;
+    }
+    .result-score {
+      font-size: 2.5em;
+      font-weight: bold;
+      color: #667eea;
+      margin: 20px 0;
+    }
+    .result-feedback {
+      font-size: 1.1em;
+      color: #555;
+      margin: 15px 0;
+      line-height: 1.6;
+    }
+    .result-breakdown {
+      background: #f8f9fa;
+      border-radius: 10px;
+      padding: 20px;
+      margin: 20px 0;
+      text-align: left;
+    }
+    .result-breakdown h3 {
+      color: #667eea;
+      margin-top: 0;
+      margin-bottom: 15px;
+    }
+    .category-score {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    .category-score:last-child {
+      border-bottom: none;
+    }
+    .restart-btn {
+      background: linear-gradient(135deg, #f093fb, #f5576c);
+      margin-top: 15px;
+    }
+    .restart-btn:hover {
+      background: linear-gradient(135deg, #f5576c, #f093fb);
+    }
+    .timer {
+      font-weight: 600;
+      color: #667eea;
+    }
+    .hidden { 
+      display: none; 
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎯 Company Aptitude Test</h1>
+    <p class="intro">Prepare yourself for company placement exams. Test your skills in Quantitative Aptitude, Logical Reasoning, and Verbal Ability.</p>
+    
+    <div id="quizSection">
+      <div class="question-info">
+        <span id="questionCounter"></span>
+        <span class="timer" id="timer"></span>
+      </div>
+      <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+      <span class="question-category" id="category"></span>
+      <div id="quiz"></div>
+      <button id="nextBtn">Next Question</button>
+    </div>
+    
+    <div id="result" class="hidden"></div>
+  </div>
+
+  <script>
+    const questions = [
+      // Quantitative Aptitude
+      {
+        question: 'If the cost price of 15 items equals the selling price of 12 items, what is the profit percentage?',
+        options: ['20%', '25%', '30%', '15%'],
+        answer: 1,
+        category: 'Quantitative'
+      },
+      {
+        question: 'A train 150m long passes a pole in 15 seconds. What is its speed in km/hr?',
+        options: ['36 km/hr', '40 km/hr', '45 km/hr', '50 km/hr'],
+        answer: 0,
+        category: 'Quantitative'
+      },
+      {
+        question: 'If 5 workers can build a wall in 20 days, how long will 10 workers take?',
+        options: ['5 days', '10 days', '15 days', '20 days'],
+        answer: 1,
+        category: 'Quantitative'
+      },
+      {
+        question: 'The average of 5 numbers is 27. If one number is excluded, the average becomes 25. What is the excluded number?',
+        options: ['30', '35', '40', '45'],
+        answer: 1,
+        category: 'Quantitative'
+      },
+      {
+        question: 'A sum of money doubles itself in 8 years at simple interest. In how many years will it triple itself?',
+        options: ['12 years', '16 years', '18 years', '24 years'],
+        answer: 1,
+        category: 'Quantitative'
+      },
+      
+      // Logical Reasoning
+      {
+        question: 'Find the next number in the series: 2, 6, 12, 20, 30, ?',
+        options: ['36', '40', '42', '56'],
+        answer: 2,
+        category: 'Logical'
+      },
+      {
+        question: 'A is older than B, and B is older than C. Which of the following is true?',
+        options: ['A is the youngest', 'C is older than A', 'A is the oldest', 'B is the oldest'],
+        answer: 2,
+        category: 'Logical'
+      },
+      {
+        question: 'If BOOK is coded as CPPL, how is PAGE coded?',
+        options: ['QBHF', 'QBGF', 'QCHF', 'PBGF'],
+        answer: 0,
+        category: 'Logical'
+      },
+      {
+        question: 'In a certain code, COMPUTER is written as RFUVQNPC. How is MEDICINE written in that code?',
+        options: ['EOJDEJFM', 'EOJDJEFM', 'EOJDEFJM', 'NFEJDJOF'],
+        answer: 1,
+        category: 'Logical'
+      },
+      {
+        question: 'Complete the pattern: ACE, FHJ, KMO, ?',
+        options: ['PQR', 'PRT', 'QSU', 'PRS'],
+        answer: 1,
+        category: 'Logical'
+      },
+      
+      // Verbal Ability
+      {
+        question: 'Choose the correctly spelled word.',
+        options: ['Recieve', 'Receive', 'Receeve', 'Recevie'],
+        answer: 1,
+        category: 'Verbal'
+      },
+      {
+        question: 'Choose the word that is opposite in meaning to "ABUNDANT":',
+        options: ['Plentiful', 'Scarce', 'Sufficient', 'Ample'],
+        answer: 1,
+        category: 'Verbal'
+      },
+      {
+        question: 'Choose the word closest in meaning to "METICULOUS":',
+        options: ['Careless', 'Detailed', 'Quick', 'Simple'],
+        answer: 1,
+        category: 'Verbal'
+      },
+      {
+        question: 'Identify the error: "Each of the students have submitted their assignments."',
+        options: ['Each of', 'have submitted', 'their assignments', 'No error'],
+        answer: 1,
+        category: 'Verbal'
+      },
+      {
+        question: 'Fill in the blank: The company will _____ a new policy next month.',
+        options: ['implement', 'impliment', 'implemant', 'implemet'],
+        answer: 0,
+        category: 'Verbal'
+      }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+    let categoryScores = { Quantitative: 0, Logical: 0, Verbal: 0 };
+    let categoryTotals = { Quantitative: 0, Logical: 0, Verbal: 0 };
+    let startTime = Date.now();
+    let timerInterval;
+
+    const quizDiv = document.getElementById('quiz');
+    const nextBtn = document.getElementById('nextBtn');
+    const resultDiv = document.getElementById('result');
+    const progressBar = document.getElementById('progressBar');
+    const questionCounter = document.getElementById('questionCounter');
+    const categoryDiv = document.getElementById('category');
+    const timerDiv = document.getElementById('timer');
+    const quizSection = document.getElementById('quizSection');
+
+    // Count questions per category
+    questions.forEach(q => categoryTotals[q.category]++);
+
+    function updateTimer() {
+      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+      const minutes = Math.floor(elapsed / 60);
+      const seconds = elapsed % 60;
+      timerDiv.textContent = `Time: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    function updateProgress() {
+      const progress = (currentQuestion / questions.length) * 100;
+      progressBar.style.width = progress + '%';
+      questionCounter.textContent = `Question ${currentQuestion + 1} of ${questions.length}`;
+    }
+
+    function showQuestion() {
+      const q = questions[currentQuestion];
+      categoryDiv.textContent = q.category + ' Aptitude';
+      
+      quizDiv.innerHTML = `
+        <div class='question'>Q${currentQuestion + 1}. ${q.question}</div>
+        <div class='options'>
+          ${q.options.map((opt, i) => `
+            <label>
+              <input type='radio' name='answer' value='${i}'> ${opt}
+            </label>
+          `).join('')}
+        </div>
+      `;
+      
+      updateProgress();
+      nextBtn.textContent = currentQuestion === questions.length - 1 ? 'Submit Test' : 'Next Question';
+      nextBtn.disabled = true;
+      
+      document.querySelectorAll('input[name="answer"]').forEach(input => {
+        input.addEventListener('change', () => {
+          nextBtn.disabled = false;
+        });
+      });
+    }
+
+    function showResult() {
+      clearInterval(timerInterval);
+      const totalTime = Math.floor((Date.now() - startTime) / 1000);
+      const minutes = Math.floor(totalTime / 60);
+      const seconds = totalTime % 60;
+      
+      const percent = Math.round((score / questions.length) * 100);
+      let feedback = '';
+      let emoji = '';
+      
+      if (percent >= 80) {
+        feedback = 'Excellent! You are well-prepared for company aptitude tests. Keep up the great work!';
+        emoji = '🎉';
+      } else if (percent >= 60) {
+        feedback = 'Good job! You have a solid foundation. Practice more to improve your score.';
+        emoji = '👍';
+      } else if (percent >= 40) {
+        feedback = 'Fair performance. Focus on practicing reasoning and quantitative skills regularly.';
+        emoji = '📚';
+      } else {
+        feedback = 'Needs improvement. Dedicate time to strengthen your fundamentals in all areas.';
+        emoji = '💪';
+      }
+
+      const categoryBreakdown = Object.keys(categoryScores).map(cat => {
+        const catPercent = categoryTotals[cat] > 0 
+          ? Math.round((categoryScores[cat] / categoryTotals[cat]) * 100) 
+          : 0;
+        return `
+          <div class="category-score">
+            <span><strong>${cat}:</strong></span>
+            <span>${categoryScores[cat]}/${categoryTotals[cat]} (${catPercent}%)</span>
+          </div>
+        `;
+      }).join('');
+
+      quizSection.classList.add('hidden');
+      resultDiv.classList.remove('hidden');
+      resultDiv.innerHTML = `
+        <h2>${emoji} Test Complete!</h2>
+        <div class="result-score">${score}/${questions.length}</div>
+        <div class="result-score" style="font-size: 1.5em;">${percent}%</div>
+        <div class="result-feedback">${feedback}</div>
+        <div class="result-feedback" style="font-size: 0.95em; color: #888;">
+          ⏱️ Time Taken: ${minutes}:${seconds.toString().padStart(2, '0')}
+        </div>
+        <div class="result-breakdown">
+          <h3>📊 Category-wise Performance</h3>
+          ${categoryBreakdown}
+        </div>
+        <button class="restart-btn" onclick="location.reload()">Retake Test</button>
+      `;
+    }
+
+    nextBtn.addEventListener('click', () => {
+      const selected = document.querySelector('input[name="answer"]:checked');
+      if (!selected) {
+        alert('Please select an answer before continuing.');
+        return;
+      }
+      
+      const q = questions[currentQuestion];
+      if (parseInt(selected.value) === q.answer) {
+        score++;
+        categoryScores[q.category]++;
+      }
+      
+      currentQuestion++;
+      if (currentQuestion < questions.length) {
+        showQuestion();
+      } else {
+        showResult();
+      }
+    });
+
+    // Start timer
+    timerInterval = setInterval(updateTimer, 1000);
+    updateTimer();
+    showQuestion();
+  </script>
+</body>
+</html>

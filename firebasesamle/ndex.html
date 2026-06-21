@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Advanced Career Quiz & Recommender</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="#">CareerPilot</a>
+      <nav class="nav">
+        <a href="#quiz">Quiz</a>
+        <a href="#results">Results</a>
+        <a href="#about">About</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section id="quiz" class="card">
+      <h1>Student Career Quiz — Find Best-Fit Jobs</h1>
+      <p class="muted">Answer these questions about your stream, skills and interests. The system suggests jobs and learns from your feedback.</p>
+
+      <form id="quizForm" aria-label="Career Quiz">
+        <div class="row">
+          <label for="name">Name (optional)</label>
+          <input id="name" type="text" placeholder="Your name" />
+        </div>
+
+        <div class="row">
+          <label for="stream">Stream / Preferred field</label>
+          <select id="stream" required>
+            <option value="">-- Select stream --</option>
+            <option value="science">Science</option>
+            <option value="commerce">Commerce</option>
+            <option value="arts">Arts / Humanities</option>
+            <option value="vocational">Vocational / Technical</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <label>Skills (check all that apply)</label>
+          <div class="chips" id="skillsList">
+            <label><input type="checkbox" value="programming"> Programming</label>
+            <label><input type="checkbox" value="math"> Math / Analytics</label>
+            <label><input type="checkbox" value="writing"> Writing / Communication</label>
+            <label><input type="checkbox" value="mechanical"> Mechanical / Hands-on</label>
+            <label><input type="checkbox" value="leadership"> Leadership / Discipline</label>
+            <label><input type="checkbox" value="creativity"> Creativity / Design</label>
+            <label><input type="checkbox" value="teaching"> Teaching / Mentoring</label>
+            <label><input type="checkbox" value="attention"> Attention to detail</label>
+            <label><input type="checkbox" value="physical"> Physical fitness</label>
+            <label><input type="checkbox" value="sales"> Sales / Persuasion</label>
+            <label><input type="checkbox" value="medical"> Medical / Healthcare</label>
+            <label><input type="checkbox" value="admin"> Admin / Clerical</label>
+          </div>
+        </div>
+
+        <div class="row">
+          <label>Interests (choose up to 3)</label>
+          <div class="chips" id="interestsList">
+            <label><input type="checkbox" value="tech"> Technology</label>
+            <label><input type="checkbox" value="helping"> Helping people / Healthcare</label>
+            <label><input type="checkbox" value="law"> Law / Justice</label>
+            <label><input type="checkbox" value="design"> Design / Art</label>
+            <label><input type="checkbox" value="business"> Business / Finance</label>
+            <label><input type="checkbox" value="publicservice"> Public service / Defence</label>
+            <label><input type="checkbox" value="education"> Education / Teaching</label>
+            <label><input type="checkbox" value="trade"> Skilled trade</label>
+            <label><input type="checkbox" value="management"> Management</label>
+            <label><input type="checkbox" value="creative"> Media / Creative content</label>
+            <label><input type="checkbox" value="adventure"> Adventure / Travel</label>
+            <label><input type="checkbox" value="businessops"> Operations</label>
+          </div>
+          <p class="muted small">Tip: choose up to 3 interests for best results.</p>
+        </div>
+
+        <div class="row">
+          <label for="workStyle">Preferred work style</label>
+          <select id="workStyle">
+            <option value="">-- Select --</option>
+            <option value="office">Office / Desk</option>
+            <option value="field">Field / Outdoors</option>
+            <option value="hands-on">Hands-on / Practical</option>
+            <option value="flexible">Flexible / Remote</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <label for="risk">Risk tolerance</label>
+          <select id="risk">
+            <option value="">-- Select --</option>
+            <option value="low">Low (stable)</option>
+            <option value="medium">Medium</option>
+            <option value="high">High (adventurous)</option>
+          </select>
+        </div>
+
+        <div class="actions">
+          <button type="submit">Get Personalized Suggestions</button>
+          <button type="button" id="resetBtn" class="muted-btn">Reset Training</button>
+        </div>
+      </form>
+    </section>
+
+    <section id="results" class="card hidden">
+      <h2>Top Job Matches</h2>
+      <div id="weightsBox" class="muted small">Weights: <span id="weightsDisplay"></span></div>
+      <div id="suggestions" class="grid"></div>
+
+      <div class="feedback">
+        <p>Was this helpful?</p>
+        <div class="feedback-actions">
+          <button id="feedback-good">Yes — helpful</button>
+          <button id="feedback-bad" class="muted-btn">No — not helpful</button>
+        </div>
+        <p class="muted small">Feedback trains the recommender locally (stored in your browser only).</p>
+      </div>
+    </section>
+
+    <section id="about" class="card muted">
+      <h3>About this recommender</h3>
+      <p>This uses a human-readable dataset (`dataset.js`), a weighted scoring algorithm (skills / interests / stream), and a tiny local feedback trainer that adjusts component weights to improve future recommendations for this browser.</p>
+      <p>Edit <code>dataset.js</code> to add more jobs or refine skill/tag mappings.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p class="muted">Made for your project • Local demo • No backend required</p>
+    </div>
+  </footer>
+
+  <script src="dataset.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

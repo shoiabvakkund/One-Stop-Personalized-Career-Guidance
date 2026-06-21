@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Personality Test | Career Guidance</title>
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      background: #fff;
+      width: 90%;
+      max-width: 650px;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      text-align: center;
+    }
+    h2 {
+      color: #667eea;
+      font-size: 2em;
+      margin-bottom: 10px;
+    }
+    .subtitle {
+      color: #666;
+      font-size: 1em;
+      margin-bottom: 25px;
+    }
+    .progress-container {
+      background: #e0e0e0;
+      border-radius: 10px;
+      height: 8px;
+      margin: 20px 0;
+      overflow: hidden;
+    }
+    .progress-bar {
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      height: 100%;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+    .question-counter {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 20px;
+    }
+    .question {
+      margin: 25px 0;
+      text-align: left;
+    }
+    .question p {
+      font-weight: 600;
+      color: #333;
+      font-size: 1.1em;
+      margin-bottom: 15px;
+    }
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .options label {
+      background: #f8f9fa;
+      padding: 14px 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+    }
+    .options label:hover {
+      background: #f0f4ff;
+      border-color: #667eea;
+      transform: translateX(5px);
+    }
+    .options input[type="radio"] {
+      margin-right: 12px;
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+    button {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff;
+      border: none;
+      padding: 14px 30px;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: all 0.3s ease;
+      font-size: 1em;
+      font-weight: 600;
+      width: 100%;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+    }
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .result {
+      display: none;
+      text-align: center;
+      animation: fadeIn 0.5s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .result h3 {
+      color: #667eea;
+      font-size: 1.8em;
+      margin: 20px 0;
+    }
+    .personality-type {
+      font-size: 2em;
+      color: #764ba2;
+      font-weight: bold;
+      margin: 15px 0;
+    }
+    .result-description {
+      color: #555;
+      font-size: 1.05em;
+      line-height: 1.7;
+      margin: 20px 0;
+      text-align: left;
+    }
+    .career-box {
+      background: #f8f9fa;
+      padding: 25px;
+      border-radius: 12px;
+      margin: 20px 0;
+      text-align: left;
+    }
+    .career-box h4 {
+      color: #667eea;
+      margin-top: 0;
+      margin-bottom: 12px;
+      font-size: 1.2em;
+    }
+    .career-box ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .career-box li {
+      padding: 8px 0;
+      color: #555;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    .career-box li:last-child {
+      border-bottom: none;
+    }
+    .traits {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin: 20px 0;
+    }
+    .trait {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.9em;
+    }
+    .restart-btn {
+      background: linear-gradient(135deg, #f093fb, #f5576c);
+      margin-top: 15px;
+    }
+    .restart-btn:hover {
+      background: linear-gradient(135deg, #f5576c, #f093fb);
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>🧠 Personality Test</h2>
+    <p class="subtitle">Discover your personality type and the best career path for you!</p>
+    
+    <div id="quizSection">
+      <div class="question-counter" id="counter"></div>
+      <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+      <div id="quiz"></div>
+      <button id="nextBtn">Next Question</button>
+    </div>
+    
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        question: 'How do you prefer to spend your free time?',
+        options: [
+          { text: 'Solving puzzles or learning new skills', type: 'Analytical' },
+          { text: 'Spending time with friends and family', type: 'Social' },
+          { text: 'Creating art, writing, or designing', type: 'Creative' },
+          { text: 'Planning and organizing activities', type: 'Organized' }
+        ]
+      },
+      {
+        question: 'When faced with a problem, you typically:',
+        options: [
+          { text: 'Analyze it logically and find the best solution', type: 'Analytical' },
+          { text: 'Discuss it with others to get different perspectives', type: 'Social' },
+          { text: 'Think outside the box for innovative solutions', type: 'Creative' },
+          { text: 'Create a systematic plan to tackle it', type: 'Organized' }
+        ]
+      },
+      {
+        question: 'What motivates you the most at work or school?',
+        options: [
+          { text: 'Solving complex challenges', type: 'Analytical' },
+          { text: 'Helping and collaborating with others', type: 'Social' },
+          { text: 'Expressing my unique ideas', type: 'Creative' },
+          { text: 'Achieving goals and staying efficient', type: 'Organized' }
+        ]
+      },
+      {
+        question: 'In group projects, you usually:',
+        options: [
+          { text: 'Focus on research and data analysis', type: 'Analytical' },
+          { text: 'Coordinate and communicate with team members', type: 'Social' },
+          { text: 'Come up with creative concepts and designs', type: 'Creative' },
+          { text: 'Plan timelines and manage tasks', type: 'Organized' }
+        ]
+      },
+      {
+        question: 'Which best describes your work style?',
+        options: [
+          { text: 'Methodical and detail-oriented', type: 'Analytical' },
+          { text: 'Collaborative and people-focused', type: 'Social' },
+          { text: 'Imaginative and flexible', type: 'Creative' },
+          { text: 'Structured and goal-driven', type: 'Organized' }
+        ]
+      },
+      {
+        question: 'What kind of environment do you thrive in?',
+        options: [
+          { text: 'Quiet space with minimal distractions', type: 'Analytical' },
+          { text: 'Dynamic environment with team interaction', type: 'Social' },
+          { text: 'Inspiring space that sparks creativity', type: 'Creative' },
+          { text: 'Well-organized and efficient workspace', type: 'Organized' }
+        ]
+      },
+      {
+        question: 'How do you make decisions?',
+        options: [
+          { text: 'Based on facts, data, and logic', type: 'Analytical' },
+          { text: 'After consulting with trusted people', type: 'Social' },
+          { text: 'Following my intuition and instincts', type: 'Creative' },
+          { text: 'Using a pros-and-cons list', type: 'Organized' }
+        ]
+      },
+      {
+        question: 'What drains your energy the most?',
+        options: [
+          { text: 'Dealing with illogical situations', type: 'Analytical' },
+          { text: 'Working alone for extended periods', type: 'Social' },
+          { text: 'Following strict routines without flexibility', type: 'Creative' },
+          { text: 'Chaos and lack of structure', type: 'Organized' }
+        ]
+      },
+      {
+        question: 'Which activity sounds most appealing?',
+        options: [
+          { text: 'Conducting research or experiments', type: 'Analytical' },
+          { text: 'Organizing a community event', type: 'Social' },
+          { text: 'Starting a creative project', type: 'Creative' },
+          { text: 'Developing a detailed plan or system', type: 'Organized' }
+        ]
+      },
+      {
+        question: 'What do you value most in your career?',
+        options: [
+          { text: 'Intellectual challenges and growth', type: 'Analytical' },
+          { text: 'Making a positive impact on people', type: 'Social' },
+          { text: 'Freedom to express creativity', type: 'Creative' },
+          { text: 'Clear goals and measurable success', type: 'Organized' }
+        ]
+      }
+    ];
+
+    let currentQuestion = 0;
+    const scores = { Analytical: 0, Social: 0, Creative: 0, Organized: 0 };
+
+    const quizDiv = document.getElementById('quiz');
+    const nextBtn = document.getElementById('nextBtn');
+    const resultDiv = document.getElementById('result');
+    const progressBar = document.getElementById('progressBar');
+    const counter = document.getElementById('counter');
+    const quizSection = document.getElementById('quizSection');
+
+    function updateProgress() {
+      const progress = (currentQuestion / questions.length) * 100;
+      progressBar.style.width = progress + '%';
+      counter.textContent = `Question ${currentQuestion + 1} of ${questions.length}`;
+    }
+
+    function showQuestion() {
+      const q = questions[currentQuestion];
+      const optionsHTML = q.options.map((option, index) => `
+        <label>
+          <input type='radio' name='answer' value='${index}'>
+          ${option.text}
+        </label>
+      `).join('');
+
+      quizDiv.innerHTML = `
+        <div class='question'>
+          <p>${currentQuestion + 1}. ${q.question}</p>
+          <div class='options'>
+            ${optionsHTML}
+          </div>
+        </div>
+      `;
+
+      updateProgress();
+      nextBtn.textContent = currentQuestion === questions.length - 1 ? 'See Results' : 'Next Question';
+      nextBtn.disabled = true;
+
+      document.querySelectorAll('input[name="answer"]').forEach(input => {
+        input.addEventListener('change', () => {
+          nextBtn.disabled = false;
+        });
+      });
+    }
+
+    function showResult() {
+      const topType = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
+
+      const personalityData = {
+        Analytical: {
+          name: 'Analytical Thinker',
+          emoji: '🔬',
+          description: 'You are logical, methodical, and detail-oriented. You excel at problem-solving and making data-driven decisions. You prefer working with facts and figures rather than emotions.',
+          traits: ['Logical', 'Detail-Oriented', 'Methodical', 'Problem-Solver', 'Data-Driven'],
+          careers: [
+            'Software Engineer / Developer',
+            'Data Scientist / Analyst',
+            'Financial Analyst',
+            'Research Scientist',
+            'Engineer (Mechanical/Electrical/Civil)',
+            'Mathematician / Statistician',
+            'Systems Analyst',
+            'Quality Assurance Specialist'
+          ],
+          strengths: 'Your analytical skills help you break down complex problems and find efficient solutions. You thrive in roles that require critical thinking and precision.'
+        },
+        Social: {
+          name: 'Social Helper',
+          emoji: '🤝',
+          description: 'You are empathetic, communicative, and people-oriented. You find fulfillment in helping others and working collaboratively. Your interpersonal skills are your greatest asset.',
+          traits: ['Empathetic', 'Communicative', 'Team Player', 'Supportive', 'Collaborative'],
+          careers: [
+            'Teacher / Professor',
+            'Counselor / Therapist',
+            'Human Resources Manager',
+            'Social Worker',
+            'Healthcare Professional (Nurse/Doctor)',
+            'Customer Success Manager',
+            'Sales Representative',
+            'Community Manager'
+          ],
+          strengths: 'Your ability to connect with people makes you excellent at building relationships and creating positive work environments. You excel in roles that involve teamwork and communication.'
+        },
+        Creative: {
+          name: 'Creative Innovator',
+          emoji: '🎨',
+          description: 'You are imaginative, innovative, and artistic. You think outside the box and bring fresh perspectives to everything you do. You thrive when given creative freedom.',
+          traits: ['Imaginative', 'Innovative', 'Artistic', 'Flexible', 'Original'],
+          careers: [
+            'Graphic Designer / UI/UX Designer',
+            'Content Writer / Copywriter',
+            'Marketing Specialist',
+            'Video Editor / Animator',
+            'Photographer / Videographer',
+            'Product Designer',
+            'Advertising Creative',
+            'Art Director'
+          ],
+          strengths: 'Your creative thinking allows you to develop unique solutions and compelling content. You excel in roles that value innovation and artistic expression.'
+        },
+        Organized: {
+          name: 'Strategic Organizer',
+          emoji: '📋',
+          description: 'You are structured, efficient, and goal-oriented. You excel at planning, organizing, and executing tasks systematically. You bring order to chaos.',
+          traits: ['Organized', 'Efficient', 'Goal-Driven', 'Systematic', 'Reliable'],
+          careers: [
+            'Project Manager',
+            'Business Analyst',
+            'Operations Manager',
+            'Event Planner',
+            'Executive Assistant',
+            'Supply Chain Manager',
+            'Process Improvement Specialist',
+            'Administrative Manager'
+          ],
+          strengths: 'Your organizational skills and attention to detail make you excellent at managing complex projects and ensuring everything runs smoothly.'
+        }
+      };
+
+      const data = personalityData[topType];
+
+      quizSection.classList.add('hidden');
+      resultDiv.style.display = 'block';
+      resultDiv.innerHTML = `
+        <h3>Your Personality Type:</h3>
+        <div class="personality-type">${data.emoji} ${data.name}</div>
+        <div class="result-description">${data.description}</div>
+        
+        <div class="traits">
+          ${data.traits.map(trait => `<span class="trait">${trait}</span>`).join('')}
+        </div>
+
+        <div class="career-box">
+          <h4>💼 Recommended Careers:</h4>
+          <ul>
+            ${data.careers.map(career => `<li>• ${career}</li>`).join('')}
+          </ul>
+        </div>
+
+        <div class="result-description">
+          <strong>Why these careers?</strong><br>
+          ${data.strengths}
+        </div>
+
+        <button class="restart-btn" onclick="location.reload()">Take Test Again</button>
+      `;
+    }
+
+    nextBtn.addEventListener('click', () => {
+      const selected = document.querySelector('input[name="answer"]:checked');
+      if (!selected) {
+        alert('Please select an answer before continuing.');
+        return;
+      }
+
+      const q = questions[currentQuestion];
+      const selectedOption = q.options[parseInt(selected.value)];
+      scores[selectedOption.type]++;
+
+      currentQuestion++;
+      if (currentQuestion < questions.length) {
+        showQuestion();
+      } else {
+        showResult();
+      }
+    });
+
+    showQuestion();
+  </script>
+</body>
+</html>
